@@ -1,11 +1,9 @@
 import 'package:bloc_pattern/bloc_pattern.dart';
-import 'package:login_flare/app/modules/login/validators.dart';
+import 'package:login_flare/app/modules/login/utils/validators.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:rxdart/subjects.dart';
 
 class LoginBloc extends BlocBase with Validators {
-  //dispose will be called automatically by closing its streams
-
   final _emailController = BehaviorSubject<String>();
   final _passwordController = BehaviorSubject<String>();
 
@@ -17,7 +15,7 @@ class LoginBloc extends BlocBase with Validators {
   Stream<String> get email => _emailController.stream.transform(validateEmail);
   Stream<String> get password =>
       _passwordController.stream.transform(validatePassword);
-  
+
   //Validation form
   Stream<bool> get submitValid =>
       Observable.combineLatest2(email, password, (e, p) => true);
@@ -35,9 +33,7 @@ class LoginBloc extends BlocBase with Validators {
         (validPassword == "123456") && (validEmail == "test@email.com");
     //Time for build response
     await Future.delayed(Duration(seconds: 2));
-
     String _action = response ? "success" : "fail";
-
     _teddyActionController.add(_action);
     //Time for run animation
     await Future.delayed(Duration(seconds: 1));
@@ -45,6 +41,7 @@ class LoginBloc extends BlocBase with Validators {
     return response;
   }
 
+  //Animation States
   void emailFocus() {
     _teddyActionController.add("test");
   }
@@ -52,7 +49,7 @@ class LoginBloc extends BlocBase with Validators {
   void passwordIsNotFocus() {
     _teddyActionController.add("hands_down");
   }
-  
+
   void passwordFocus({bool hide}) {
     if (hide)
       _teddyActionController.add("hands_up");
