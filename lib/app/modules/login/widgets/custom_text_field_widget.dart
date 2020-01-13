@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class CustomTextFieldWidget extends StatefulWidget {
+class CustomTextFieldWidget extends StatelessWidget {
   final String hintText;
   final TextEditingController controller;
   final bool obscureText;
@@ -22,16 +22,9 @@ class CustomTextFieldWidget extends StatefulWidget {
   });
 
   @override
-  _CustomTextFieldWidgetState createState() => _CustomTextFieldWidgetState();
-}
-
-class _CustomTextFieldWidgetState extends State<CustomTextFieldWidget> {
-  bool isValid = true;
-
-  @override
   Widget build(BuildContext context) {
     return Container(
-      width: widget.width,
+      width: width,
       margin: EdgeInsets.symmetric(horizontal: 15),
       child: Container(
         padding: EdgeInsets.symmetric(
@@ -40,18 +33,16 @@ class _CustomTextFieldWidgetState extends State<CustomTextFieldWidget> {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
+          children: [
             TextField(
-              focusNode: widget.focus,
-              onChanged: widget.onChanged,
-              obscureText: widget.obscureText,
-              controller: widget.controller,
+              focusNode: focus,
+              onChanged: onChanged,
+              obscureText: obscureText,
+              controller: controller,
               decoration: InputDecoration(
-                hintText: widget.hintText,
-                hintStyle: _textStyle,
-                errorText: widget.textError,
-                suffixIcon:
-                    widget.suffixIcon != null ? widget.suffixIcon : null,
+                hintText: hintText,
+                errorText: textError,
+                suffixIcon: suffixIcon,
               ),
             ),
           ],
@@ -59,11 +50,4 @@ class _CustomTextFieldWidgetState extends State<CustomTextFieldWidget> {
       ),
     );
   }
-
-  static final TextStyle _textStyle = TextStyle(
-    color: Color(0xffb4b7b8),
-    fontSize: 15,
-    fontWeight: FontWeight.w500,
-    fontStyle: FontStyle.normal,
-  );
 }

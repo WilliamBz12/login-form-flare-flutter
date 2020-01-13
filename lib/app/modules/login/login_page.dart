@@ -2,15 +2,13 @@ import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:login_flare/app/modules/home/home_module.dart';
 import 'package:login_flare/app/modules/login/login_module.dart';
-import 'package:login_flare/app/modules/login/widgets/custom_button.dart';
+import 'package:login_flare/app/modules/login/widgets/custom_button_widget.dart';
 import 'package:login_flare/app/modules/login/widgets/custom_text_field_widget.dart';
+import 'package:login_flare/app/modules/login/widgets/suffix_icon_widget.dart';
 
 import 'login_bloc.dart';
 
 class LoginPage extends StatefulWidget {
-  final String title;
-  const LoginPage({Key key, this.title = "Login"}) : super(key: key);
-
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -21,10 +19,7 @@ class _LoginPageState extends State<LoginPage> {
   bool _hidePass = true;
   bool _isLoading = false;
 
-  String password;
-  String email;
-
-  final _bloc = LoginModule.to.getBloc<LoginBloc>();
+  final _loginBloc = LoginModule.to.getBloc<LoginBloc>();
 
   final _emailFocus = FocusNode();
   final _passwordFocus = FocusNode();
@@ -32,25 +27,24 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-
+    //add function to listen alterations in TextField
     _emailFocus.addListener(() {
       if (_emailFocus.hasFocus) {
-        _bloc.emailFocus();
+        _loginBloc.emailFocus();
       }
     });
-
     _passwordFocus.addListener(() {
       if (_passwordFocus.hasFocus) {
-        _bloc.passwordFocus(hide: _hidePass);
+        _loginBloc.passwordFocus(hide: _hidePass);
       }
     });
   }
 
   void _onTapButton() async {
     setState(() => _isLoading = true);
-    bool response = await _bloc.submit();
+    bool result = await _loginBloc.submit();
 
-    if (response) {
+    if (result) {
       Navigator.of(context).push(
         MaterialPageRoute(builder: (context) => HomeModule()),
       );
@@ -65,83 +59,91 @@ class _LoginPageState extends State<LoginPage> {
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            SizedBox(
-              height: 100,
-            ),
-            StreamBuilder<String>(
-              stream: _bloc.outTeddyAction,
-              initialData: "test",
-              builder: (context, snapshot) {
-                return Container(
-                  height: 200,
-                  margin: EdgeInsets.symmetric(horizontal: 20),
-                  child: FlareActor(
-                    "assets/teddy.flr",
-                    alignment: Alignment.center,
-                    fit: BoxFit.fitWidth,
-                    animation: snapshot.data,
-                    //controller: _teddyController,
-                  ),
-                );
-              },
-            ),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              margin: EdgeInsets.symmetric(horizontal: 15),
-              child: Column(
-                children: <Widget>[
-                  StreamBuilder(
-                      stream: _bloc.email,
-                      builder: (context, snapshot) {
-                        return CustomTextFieldWidget(
-                          controller: _emailController,
-                          hintText: "e-mail",
-                          focus: _emailFocus,
-                          onChanged: _bloc.changeEmail,
-                          textError: snapshot.error,
-                        );
-                      }),
-                  StreamBuilder(
-                      stream: _bloc.password,
-                      builder: (context, snapshot) {
-                        return CustomTextFieldWidget(
-                          controller: _passwordController,
-                          hintText: "Senha",
-                          focus: _passwordFocus,
-                          suffixIcon: _suffixIcon(),
-                          onChanged: _bloc.changePassword,
-                          obscureText: _hidePass,
-                          textError: snapshot.error,
-                        );
-                      }),
-                  StreamBuilder(
-                      stream: _bloc.submitValid,
-                      builder: (context, snapshot) {
-                        return CustomButtonWidget(
-                          onTap: snapshot.hasData ? _onTapButton : null,
-                          isLoading: _isLoading,
-                          text: "Login",
-                        );
-                      }),
-                ],
-              ),
-            ),
+            SizedBox(height: 100),
+            _buildTeddy(),
+            _buildForm(),
           ],
         ),
       ),
     );
   }
 
-  Widget _suffixIcon() {
-    return InkWell(
-      child: _hidePass ? Icon(Icons.visibility) : Icon(Icons.visibility_off),
+  Widget _buildTeddy() {
+    return StreamBuilder<String>(
+      stream: _loginBloc.outTeddyAction,
+      initialData: "test",
+      builder: (context, snapshot) {
+        return Container(
+          height: 200,
+          margin: EdgeInsets.symmetric(horizontal: 20),
+          child: FlareActor(
+            "assets/teddy.flr",
+            alignment: Alignment.center,
+            fit: BoxFit.fitWidth,
+            animation: snapshot.data,
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildForm() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+      ),
+      margin: EdgeInsets.symmetric(horizontal: 15),
+      child: Column(
+        children: <Widget>[
+          StreamBuilder(
+            stream: _loginBloc.email,
+            builder: (context, snapshot) {
+              return CustomTextFieldWidget(
+                controller: _emailController,
+                hintText: "e-mail",
+                focus: _emailFocus,
+                onChanged: _loginBloc.changeEmail,
+                textError: snapshot.error,
+              );
+            },
+          ),
+          StreamBuilder(
+            stream: _loginBloc.password,
+            builder: (context, snapshot) {
+              return CustomTextFieldWidget(
+                controller: _passwordController,
+                hintText: "password",
+                focus: _passwordFocus,
+                suffixIcon: _buildSuffixIconPassword(),
+                onChanged: _loginBloc.changePassword,
+                obscureText: _hidePass,
+                textError: snapshot.error,
+              );
+            },
+          ),
+          StreamBuilder(
+            stream: _loginBloc.submitValid,
+            builder: (context, snapshot) {
+              return CustomButtonWidget(
+                onTap: snapshot.hasData ? _onTapButton : null,
+                isLoading: _isLoading,
+                text: "Login",
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSuffixIconPassword() {
+    return SuffixIconWidget(
+      actived: _hidePass,
       onTap: () => setState(() {
         _hidePass = !_hidePass;
-        _bloc.passwordFocus(hide: _hidePass);
-      }),
+        _loginBloc.passwordFocus(hide: _hidePass);
+      })
     );
   }
 }
