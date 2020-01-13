@@ -2,15 +2,13 @@
 
 &#x27;A new Flutter project. Created by Slidy&#x27;
 
-## Getting Started
+## FLARE
 
-This project is a starting point for a Flutter application.
+This project using bloc for manage the state of animations with Flare. The example using Teddy bear in a login form where manage some possible states like typing password, email and submit (sucess and fail).
 
-A few resources to get you started if this is your first Flutter project:
+## LOGIN-FORM
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+The validations of form is made with bloc and external libraries. 
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+
